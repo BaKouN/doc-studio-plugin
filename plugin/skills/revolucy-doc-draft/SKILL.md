@@ -1,6 +1,6 @@
 ---
 name: revolucy-doc-draft
-description: Rédige un livrable client Revolucy (audit, arborescence, etc. — types industrialisés exposés par `list_doc_types`) à partir d'un brief utilisateur. Les règles de rédaction (ton, vocabulaire, contraintes) sont chargées au runtime depuis les MCP resources `revolucy://context/*`. Push le brouillon JSON au studio via le tool MCP `create_doc` et retourne l'URL d'édition. Utiliser quand l'utilisateur a un brief prospect (notes R1/R2/R3, audit technique, URL avec observations) et veut un livrable charté avec form web pour ajuster.
+description: Rédige un livrable client Revolucy (audit, arborescence, etc. — types industrialisés exposés par `list_doc_types`) à partir d'un brief utilisateur. Les règles de rédaction (ton, vocabulaire, contraintes) sont chargées au runtime depuis les MCP resources `revolucy://context/*`. Push le brouillon JSON au studio via le tool MCP `create_doc` et retourne l'URL d'édition. Utiliser quand l'utilisateur a un brief prospect (notes meeting, audit technique, URL avec observations) et veut un livrable charté avec form web pour ajuster.
 ---
 
 # Revolucy Doc Draft
