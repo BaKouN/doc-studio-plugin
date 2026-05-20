@@ -80,10 +80,37 @@ Les règles de ton, vocabulaire et typographie vivent dans `revolucy://context/t
 ### 3. Auto-vérification avant push
 
 Avant d'appeler `create_doc`, fais une passe :
+
 - Toutes les règles de `revolucy://context/ton-redactionnel` respectées
 - Aucun interdit de `revolucy://context/do-dont` enfreint
 - Aucune métrique non sourcée dans le contexte fourni
 - Tous les `required: true` du schéma renseignés
+- **Tous les `max_words` du schéma respectés** (cf. règle 4)
+
+### 4. Respecter les `max_words` du schéma — self-count avant push
+
+Le schéma déclare un `max_words` par champ texte (paragraphes, titres, items d'array). Ces caps sont calibrés pour que le contenu **tienne sur A4** une fois rendu PDF — les dépasser = contenu clippé en PDF même si la preview avait l'air OK.
+
+**Règle dure** : avant `create_doc`, pour chaque champ texte de ton draft, compte les mots après strip des tags HTML (`<em>`, `<strong>`, `<span>`, etc. ne comptent pas comme mots). Si tu dépasses un `max_words`, **trim avant d'appeler** — ne push pas un draft qui sera refusé.
+
+Exemple : si `intro_paragraphe.max_words: 150` et tu as drafté 180 mots, soit tu raccourcis dans ton draft, soit tu coupes la phrase la moins essentielle avant push. Pas de generation/refus loop.
+
+Le studio enforce comme garde-fou côté serveur : si tu push quand même un champ trop long, tu reçois :
+
+```json
+{
+  "error": "fields_too_long",
+  "doc_type": "audit",
+  "violations": [
+    {"field": "intro_paragraphe", "max_words": 150, "actual_words": 180},
+    {"field": "constats[2].corps", "max_words": 110, "actual_words": 142}
+  ]
+}
+```
+
+Dans ce cas : retrim les champs listés (avec le delta `actual - max` à enlever), re-push. Mais l'objectif est zéro roundtrip — self-check d'abord.
+
+**Note sur le comptage** : "mots" = tokens séparés par whitespace, **après strip des tags HTML**. `<em>2 leads qualifiés</em>` = 3 mots. La ponctuation collée ne crée pas de mot supplémentaire (`hello,` = 1 mot).
 
 ## Après push
 
