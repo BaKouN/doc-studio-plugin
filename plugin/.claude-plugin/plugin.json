@@ -1,0 +1,18 @@
+{
+  "name": "revolucy-doc-studio",
+  "description": "Génère des livrables clients chartés Revolucy (audit, arborescence, dossier de conception) depuis Claude Code. Serveur MCP distant doc-studio.revolucydev.com, auth OAuth 2.1 (Google).",
+  "version": "0.2.0",
+  "author": {
+    "name": "Revolucy",
+    "email": "hello@revolucy.fr"
+  },
+  "homepage": "https://revolucy.fr",
+  "keywords": [
+    "revolucy",
+    "doc-generator",
+    "audit",
+    "arborescence",
+    "pdf",
+    "mcp"
+  ]
+}

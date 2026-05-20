@@ -1,0 +1,30 @@
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Local data / artefacts
+data/
+*.pdf
+*.html
+!plugin/skills/**/*.md
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# OS / editors
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Studio runtime files (in case someone clones into the studio repo by mistake)
+users.json
+device_codes.json
+oauth_clients.json
+oauth_codes.json
+oauth_refresh.json
+oauth_pending.json
