@@ -232,6 +232,94 @@ Avant de créer un type, vérifie qu'il n'est pas couvert (même partiellement) 
 
 Par défaut, **pas de `form.html`**. Le form générique du studio lit `/api/doc_types/<doc_type>` et rend les champs depuis le schéma. Tu ne proposes un form custom que si l'utilisateur a explicitement un besoin que le générique ne couvre pas.
 
+## Gotchas print/CSS (faux overflow et drift preview↔PDF)
+
+Le studio rend deux versions du template : un HTML preview dans l'iframe du form (`@media screen`) et un PDF généré par Chromium headless (`@media print`). Si les deux divergent en spacing, l'indicateur d'overflow rayé rose en preview mentit : il signale un dépassement A4 alors que le PDF tient propre, ou inversement. Ces règles évitent ça.
+
+### 1. Padding `.page` identique en base et en `@media print`
+
+Mets le padding `.page` UNE seule fois, au top-level (hors `@media`). Ne le redéfinis PAS dans `@media print`. Si tu mets `padding: 22mm 20mm 16mm 20mm` en base et `padding: 15mm 18mm 10mm 18mm` en print, le screen render aura 13mm de moins de hauteur utile → faux overflow indicator alors que le PDF fit.
+
+```css
+/* ✅ correct */
+.page {
+  width: 210mm; min-height: 297mm;
+  padding: 15mm 18mm 10mm 18mm;
+}
+
+/* ❌ ne fais pas ça */
+.page { padding: 22mm 20mm 16mm 20mm; }
+@media print { .page { padding: 15mm 18mm 10mm 18mm; } }
+```
+
+### 2. Spacing (margin/padding/gap/font-size) au top-level, pas dupliqué
+
+Toute valeur qui doit être identique en screen et en print → au top-level. `@media print {}` ne contient QUE des règles print-spécifiques (`page-break-*`, `overflow: hidden`, `box-shadow: none`, `print-color-adjust`). Pas d'override de spacing ou de `font-size`.
+
+```css
+/* ✅ correct — spacing partagé */
+.constat { padding: 8pt 0; }
+.axes { gap: 6pt; }
+h1 { font-size: 34pt; }
+
+/* ❌ ne fais pas ça — drift garanti entre preview et PDF */
+.constat { padding: 12pt 0; }
+@media print { .constat { padding: 8pt 0; } }
+```
+
+### 3. Overflow indicator = `.page::after { top: 297mm; bottom: 0 }`
+
+L'indicateur "ça déborde" (zone rayée rose) doit être un pseudo-élément `.page::after` positionné `top: 297mm; bottom: 0`, dans `@media screen` uniquement. Quand la page fait exactement 297mm → 0 de hauteur (invisible). Quand le contenu dépasse → la page grandit et la zone rayée s'étend pour matérialiser l'overflow.
+
+```css
+@media screen {
+  .page { min-height: 297mm; overflow: visible; }
+  .page::after {
+    content: ""; position: absolute;
+    top: 297mm; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(135deg,
+      rgba(251, 0, 101, 0.06) 0, rgba(251, 0, 101, 0.06) 10px,
+      transparent 10px, transparent 22px);
+    border-top: 1.5pt dashed rgba(251, 0, 101, 0.5);
+    pointer-events: none; z-index: 0;
+  }
+}
+```
+
+Ne force JAMAIS `height: 297mm` ou `overflow: hidden` en screen — le clipping empêche la détection. C'est en print uniquement.
+
+### 4. Unités : `pt` pour typo, `mm` pour layout A4
+
+- `font-size`, `padding` interne aux blocs, `gap`, `border-width` → **`pt`**
+- `width: 210mm`, `min-height: 297mm`, padding `.page`, margins inter-page → **`mm`**
+- Évite `px` et `rem` dans les templates print : ils dépendent du DPI screen et créent du drift entre preview et export.
+
+### 5. `page-break-inside: avoid` sur les blocs non-cassables
+
+Pour les blocs qui ne doivent pas être coupés en deux entre 2 pages (un `.constat`, un `.axe`, un `.closing`, le `.footer`) :
+
+```css
+@media print {
+  .constat, .axe, .closing, .footer, .header, .hero {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  h1, h2, h3 { page-break-after: avoid; break-after: avoid; }
+}
+```
+
+Sans ça, un bloc peut être splitté au milieu en PDF → moche.
+
+### 6. Vérification au moment du preview
+
+Avant `submit_user_template`, fais le test suivant :
+
+1. Ouvre `http://localhost:8765/docs/<doc_id>` dans un browser et regarde la preview iframe.
+2. Clique **Exporter PDF**, ouvre le PDF.
+3. Compare les deux côte à côte sur la même page : ils doivent être identiques au mm près (overflow indicator inclus — s'il s'allume en preview, le contenu doit vraiment être tronqué en PDF).
+
+Si drift : le suspect numéro 1 est un padding `.page` ou un spacing oublié dans `@media print`. Cherche un override print qui n'a pas son équivalent au top-level.
+
 ## Effort estimé
 
 ~30-45 min pour les 3 artifacts minimum (schema, template, example) si le form générique suffit. +1-3h si form custom nécessaire.
