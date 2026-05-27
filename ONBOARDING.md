@@ -23,7 +23,7 @@ Tu n'as **pas besoin** de Python, git, Docker, ni de cloner quoi que ce soit. To
 Dans Claude Code, **dans la fenêtre de chat** (peu importe le dossier où tu es) :
 
 ```
-/plugin marketplace add BaKouN/doc-studio-plugin
+/plugin marketplace add https://gitlab.com/agence_revolucy/doc-studio-plugin.git
 /plugin install revolucy-doc-studio@revolucy
 ```
 
@@ -124,7 +124,7 @@ Ouvre ce lien dans ton browser (tu es déjà loggé côté studio), ajuste 1-2 d
 /plugin update revolucy-doc-studio@revolucy
 ```
 
-Claude refetch depuis GitHub et reload le plugin. Pas besoin de re-login.
+Claude refetch depuis GitLab et reload le plugin. Pas besoin de re-login.
 
 Sur Cowork desktop : pas de mise à jour côté client à faire, c'est le serveur qui héberge tout.
 
@@ -132,7 +132,7 @@ Sur Cowork desktop : pas de mise à jour côté client à faire, c'est le serveu
 
 ## Architecture (si tu es curieux)
 
-- **Le plugin** : 2 skills + 1 fichier de config qui pointe vers le serveur MCP HTTP. Sources publiques : https://github.com/BaKouN/doc-studio-plugin
+- **Le plugin** : 2 skills + 1 fichier de config qui pointe vers le serveur MCP HTTP. Sources publiques : https://gitlab.com/agence_revolucy/doc-studio-plugin
 - **Le serveur MCP** : tourne sur `https://doc-studio.revolucydev.com/mcp`, expose des tools (drafter, lister, exporter PDF) et des resources de contexte auth-gated.
 - **Auth** : OAuth 2.1 standard (PKCE), négocié automatiquement au 1er appel. Aucun token API à manipuler à la main.
 - **Whitelist** : liste d'emails côté serveur, gérée par les admins.

@@ -7,7 +7,7 @@ Plugin Claude qui connecte le studio Revolucy (`doc-studio.revolucydev.com`) en 
 ### Sur Claude Code CLI
 
 ```
-/plugin marketplace add BaKouN/doc-studio-plugin
+/plugin marketplace add https://gitlab.com/agence_revolucy/doc-studio-plugin.git
 /plugin install revolucy-doc-studio@revolucy
 ```
 
@@ -27,3 +27,5 @@ Cliquer Ajouter → login Google Revolucy dans le browser.
 ---
 
 Guide complet (premier prompt, troubleshooting, etc.) : **[ONBOARDING.md](ONBOARDING.md)**.
+
+Historique des versions : **[CHANGELOG.md](CHANGELOG.md)**.

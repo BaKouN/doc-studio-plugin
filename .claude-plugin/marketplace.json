@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Plugins Revolucy pour Claude Code (générateur de livrables chartés, etc.).",
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "plugins": [
     {
       "name": "revolucy-doc-studio",
       "source": "./plugin",
       "description": "Génère des livrables clients chartés Revolucy (audit, arborescence, dossier de conception) depuis Claude Code. Serveur MCP distant doc-studio.revolucydev.com, auth OAuth 2.1 (Google).",
-      "version": "0.2.2"
+      "version": "0.2.3"
     }
   ]
 }
